@@ -5,35 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>하루선녀</title>
     <style>
+        /* 1. 회장님 인트로 오리지널 스타일 (그대로 유지) */
         body, html { margin: 0; padding: 0; width: 100%; background: #000; color: #fff; font-family: 'Pretendard', sans-serif; overflow-x: hidden; }
         .v-container { position: relative; width: 100%; height: 100vh; overflow: hidden; scroll-snap-align: start; }
         video { width: 100%; height: 100%; object-fit: cover; }
         body { scroll-snap-type: y mandatory; }
 
-        /* 입력창 스타일 */
         .input-box {
             position: absolute; bottom: 2%; left: 50%; transform: translateX(-50%);
             width: 85%; max-width: 400px; background: rgba(0,0,0,0.92);
             padding: 15px; border-radius: 20px; border: 1px solid #ffd700;
             display: none; flex-direction: column; gap: 8px; z-index: 999;
         }
-        input, select { width: 100%; padding: 13px; border-radius: 10px; border: 1px solid #444; background: #1a1a1a; color: #fff; font-size: 15px; outline: none; }
+        input, select { width: 100%; padding: 13px; border-radius: 10px; border: 1px solid #444; background: #1a1a1a; color: #fff; font-size: 15px; }
         .gender-row { display: flex; gap: 10px; }
         .gender-btn { flex: 1; text-align: center; cursor: pointer; padding: 13px; border-radius: 10px; border: 1px solid #444; background: #1a1a1a; }
         .gender-btn.active { border-color: #ffd700; color: #ffd700; background: rgba(255,215,0,0.15); }
         .submit-btn { background: linear-gradient(45deg, #ffd700, #ff8c00); color: #000; font-weight: bold; border: none; padding: 15px; border-radius: 12px; font-size: 17px; cursor: pointer; }
 
-        /* 로딩 화면 */
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; display: none; }
-        
-        /* 선녀님 전용 스테이지 */
-        #sajuStage { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 11000; display: none; }
+        /* 2. 사주 영상 전용 레이어 (로딩 후 등장) */
+        #loadingOverlay, #sajuStage {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 10000; display: none;
+        }
+        #sajuStage { z-index: 11000; }
         .saju-text-overlay { 
             position: absolute; font-size: 1.15rem; font-weight: 700; color: #2c2c2c; 
             text-align: center; z-index: 12000; pointer-events: none; display: flex; align-items: center; justify-content: center;
         }
 
-        /* 말풍선 좌표 */
+        /* 말풍선 좌표 (회장님 영상 맞춤) */
         .pos-001, .pos-002, .pos-004, .pos-005 { top: 78%; left: 50%; transform: translate(-50%, -50%); width: 65%; }
         .pos-003 { top: 22%; left: 78%; transform: translate(-50%, -50%); width: 22%; }
         .pos-006 { top: 44%; left: 70%; transform: translate(-50%, -50%); width: 25%; }
@@ -55,11 +56,10 @@
                 <div class="gender-btn" onclick="sel('남', this)">남성</div>
                 <div class="gender-btn" onclick="sel('여', this)">여성</div>
             </div>
-            <div class="select-row" style="display:flex; gap:8px;">
+            <div style="display:flex; gap:8px; margin-top:8px;">
                 <select id="yy"></select><select id="mm"></select><select id="dd"></select>
             </div>
-            <input type="tel" id="uPhone" placeholder="전화번호" style="margin-top:8px;">
-            <button class="submit-btn" onclick="go()" style="margin-top:8px;">기록 확인하기</button>
+            <button class="submit-btn" onclick="go()" style="margin-top:8px; width:100%;">기록 확인하기</button>
         </div>
     </div>
 
@@ -70,11 +70,11 @@
     </div>
 
     <script>
-        // 1. 인트로 로직 (원래 잘 되던 것 복구)
+        // 1. 인트로 제어 (기존 로직 100% 복구)
         const y=document.getElementById('yy'), m=document.getElementById('mm'), d=document.getElementById('dd');
-        for(let i=2026;i>=1950;i--) y.innerHTML+=`<option value="${i}">${i}년</option>`;
-        for(let i=1;i<=12;i++) m.innerHTML+=`<option value="${i}">${i}월</option>`;
-        for(let i=1;i<=31;i++) d.innerHTML+=`<option value="${i}">${i}일</option>`;
+        for(let i=2026;i>=1950;i--) if(y) y.innerHTML+=`<option value="${i}">${i}년</option>`;
+        for(let i=1;i<=12;i++) if(m) m.innerHTML+=`<option value="${i}">${i}월</option>`;
+        for(let i=1;i<=31;i++) if(d) d.innerHTML+=`<option value="${i}">${i}일</option>`;
 
         let g = "";
         function sel(v, btn){ g = v; document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
@@ -82,26 +82,34 @@
         const obs = new IntersectionObserver((es) => {
             es.forEach(e => {
                 const v = e.target.querySelector('video');
-                if(e.isIntersecting) { v.play(); if(v.id === 'v3') document.getElementById('f').style.display = 'flex'; }
-                else { v.pause(); if(v.id === 'v3') document.getElementById('f').style.display = 'none'; }
+                if(e.isIntersecting) { 
+                    v.play(); 
+                    if(v.id === 'v3') document.getElementById('f').style.display = 'flex'; 
+                }
+                else { 
+                    v.pause(); 
+                    if(v.id === 'v3') document.getElementById('f').style.display = 'none'; 
+                }
             });
         }, {threshold: 0.6});
         document.querySelectorAll('.v-container').forEach(c => obs.observe(c));
 
-        // 2. 연결 고리 (로딩 -> 사주)
+        // 2. 사주 풀이 전환 (수술 부위)
         function go() {
             const n = document.getElementById('uName').value;
             if(!n || !g) { alert("정보를 입력해주세요"); return; }
-            document.getElementById('loadingOverlay').style.display = 'block';
-            const lv = document.getElementById('loadVideo');
-            lv.play();
-            lv.onended = () => { startSaju(n); };
-        }
-
-        function startSaju(name) {
-            document.getElementById('loadingOverlay').style.display = 'none';
-            document.getElementById('sajuStage').style.display = 'block';
-            playSajuCut(1, name);
+            
+            const lOverlay = document.getElementById('loadingOverlay');
+            const lVid = document.getElementById('loadVideo');
+            
+            lOverlay.style.display = 'block';
+            lVid.play();
+            
+            lVid.onended = () => {
+                lOverlay.style.display = 'none';
+                document.getElementById('sajuStage').style.display = 'block';
+                playSajuCut(1, n);
+            };
         }
 
         function playSajuCut(num, name) {
@@ -113,12 +121,11 @@
             t.className = `saju-text-overlay pos-${fn}`;
             
             const msgs = { 
-                1: name + "님, 귀한 운명을 해독합니다.", 
-                2: "기운이 솟구치는 게 보이시나요?", 
-                7: "그동안 참 고생 많으셨어요.",
-                10: "이제 재물운을 열어볼까요?" 
+                1: name + "님, 귀한 기운이 서려 있네요.", 
+                7: "정말 고생 많으셨습니다. 이제 빛이 보일 거예요.",
+                10: "자, 이제 재물운의 흐름을 볼까요?"
             };
-            t.innerText = msgs[num] || "운명의 실타래를 푸는 중...";
+            t.innerText = msgs[num] || "운명을 해독하고 있습니다...";
             
             v.load();
             v.play();
