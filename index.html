@@ -54,10 +54,10 @@
         }
         #loadingOverlay video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* ⭐ 중앙 결과 확인 버튼 스타일 */
+        /* 중앙 결과 확인 버튼 */
         #resultBtnWrap {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            display: none; z-index: 10001; width: 80%; text-align: center;
+            display: none; z-index: 10001; width: 85%; text-align: center;
         }
         .final-btn {
             background: linear-gradient(45deg, #ffd700, #ff8c00);
@@ -147,25 +147,23 @@
             if(!n || !g || !p) { alert("빈칸을 모두 채워주세요."); return; }
             if(pNum.length < 10) { alert("전화번호를 정확히 입력해주세요."); return; }
 
-            const overlay = document.getElementById('loadingOverlay');
-            const loadVid = document.getElementById('loadVideo');
-            const btnWrap = document.getElementById('resultBtnWrap');
-            
-            overlay.style.display = 'block';
-            loadVid.play();
+            document.getElementById('loadingOverlay').style.display = 'block';
+            document.getElementById('loadVideo').play();
 
-            // 로딩 영상을 5초간 보여준 뒤 중앙 버튼 노출 (유저가 충분히 느끼게)
+            // 5초 뒤 버튼 노출
             setTimeout(() => {
-                btnWrap.style.display = 'block';
+                document.getElementById('resultBtnWrap').style.display = 'block';
             }, 5000); 
         }
 
-        // 결과 확인 버튼 클릭 시 실행될 함수
+        // 결과 확인 버튼 클릭 시 (팝업 없이 즉시 실행)
         function startSaju() {
-            // 이 함수에서 사주 영상 saju_01.mp4 재생으로 넘어가게 됩니다.
-            // 지금은 임시로 다음 단계를 준비하라는 신호만 보냅니다.
-            console.log("사주 풀이 시작!");
-            // window.location.href = "saju_start.html"; // 실제 이동 시 사용
+            // 로딩 오버레이를 닫고 사주 결과 로직으로 진입
+            document.getElementById('loadingOverlay').style.display = 'none';
+            
+            // 여기에 결과 영상(saju_01.mp4)을 재생하거나 
+            // 결과 페이지로 이동하는 코드를 바로 넣으면 됩니다.
+            console.log("팝업 없이 사주 풀이로 바로 진입합니다.");
         }
     </script>
 </body>
