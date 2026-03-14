@@ -137,6 +137,62 @@
                 console.log("로딩 영상 끝. 회장님 지시 대기 중.");
             };
         }
+/* --- 회장님, 여기서부터 복사하세요 --- */
+
+// 1. 말풍선 위치 정밀 조정 스타일 (JS로 강제 주입)
+const styleSheet = document.createElement("style");
+styleSheet.innerText = `
+    .saju-text-overlay {
+        position: absolute;
+        font-family: 'Pretendard', sans-serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        line-height: 1.4;
+        color: #2c2c2c;
+        text-align: center;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+    }
+    .pos-001, .pos-002, .pos-004, .pos-005 { top: 78%; left: 50%; transform: translate(-50%, -50%); width: 60%; }
+    .pos-003 { top: 22%; left: 78%; transform: translate(-50%, -50%); width: 22%; }
+    .pos-006 { top: 44%; left: 70%; transform: translate(-50%, -50%); width: 25%; }
+    .pos-007 { top: 75%; left: 34%; transform: translate(-50%, -50%); width: 42%; }
+    .pos-008 { top: 17%; left: 50%; transform: translate(-50%, -50%); width: 40%; }
+    .pos-009 { top: 71%; left: 55%; transform: translate(-50%, -50%); width: 48%; }
+    .pos-010 { top: 19%; left: 27%; transform: translate(-50%, -50%); width: 28%; }
+`;
+document.head.appendChild(styleSheet);
+
+// 2. 로딩 후 1컷으로 부드럽게 넘어가는 함수
+function transitionToFirstVideo() {
+    const loadingScreen = document.getElementById('loading-page'); 
+    const firstVideoContainer = document.querySelector('.video-container'); 
+    const videoElement = document.getElementById('saju001');
+
+    if (loadingScreen) {
+        loadingScreen.style.transition = 'opacity 1s ease';
+        loadingScreen.style.opacity = '0';
+        
+        setTimeout(() => {
+            loadingScreen.style.display = 'none';
+            if (firstVideoContainer) {
+                firstVideoContainer.style.display = 'block';
+                firstVideoContainer.style.opacity = '0';
+                if(videoElement) videoElement.play();
+                
+                setTimeout(() => {
+                    firstVideoContainer.style.transition = 'opacity 1s ease';
+                    firstVideoContainer.style.opacity = '1';
+                    if(typeof showNextText === 'function') showNextText(1);
+                }, 100);
+            }
+        }, 1000);
+    }
+}
+/* --- 여기까지 복사해서 </script> 위에 붙이세요 --- */
     </script>
 </body>
 </html>
