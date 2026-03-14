@@ -10,22 +10,12 @@
         video { width: 100%; height: 100%; object-fit: cover; }
         body { scroll-snap-type: y mandatory; }
 
-        /* 입력창 박스 - 가로 85% + 하단으로 더 내려서 말풍선 보호 */
+        /* 입력창 디자인 - 회장님 컨펌 완료 (가로 85%, 하단 2%) */
         .input-box {
-            position: absolute; 
-            bottom: 2%; /* 5%에서 2%로 내려서 말풍선과 거리 확보 */
-            left: 50%; 
-            transform: translateX(-50%);
-            width: 85%; 
-            max-width: 400px; 
-            background: rgba(0,0,0,0.92);
-            padding: 15px 15px; 
-            border-radius: 20px; 
-            border: 1px solid #ffd700;
-            display: none; 
-            flex-direction: column; 
-            gap: 8px; /* 세로 간격을 살짝 좁혀서 전체 높이 축소 */
-            z-index: 999;
+            position: absolute; bottom: 2%; left: 50%; transform: translateX(-50%);
+            width: 85%; max-width: 400px; background: rgba(0,0,0,0.92);
+            padding: 15px 15px; border-radius: 20px; border: 1px solid #ffd700;
+            display: none; flex-direction: column; gap: 8px; z-index: 999;
             box-sizing: border-box;
         }
 
@@ -56,6 +46,13 @@
         }
 
         .info-text { color: #eee; font-size: 11px; text-align: center; line-height: 1.3; margin-top: 2px; letter-spacing: -0.5px; }
+
+        /* ⭐ 로딩 오버레이 레이어 (중요!) */
+        #loadingOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 10000; display: none;
+        }
+        #loadingOverlay video { width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
 <body>
@@ -88,6 +85,12 @@
         </div>
     </div>
 
+    <div id="loadingOverlay">
+        <video id="loadVideo" muted playsinline>
+            <source src="loading.mp4" type="video/mp4">
+        </video>
+    </div>
+
     <script>
         const y=document.getElementById('yy'), m=document.getElementById('mm'), d=document.getElementById('dd');
         for(let i=2026;i>=1950;i--) y.innerHTML+=`<option value="${i}">${i}년</option>`;
@@ -115,20 +118,26 @@
         }, {threshold: 0.6});
         document.querySelectorAll('.v-container').forEach(c => obs.observe(c));
 
+        // ⭐ 로딩 시작 및 다음 화면 전환 로직
         function go(){
             const n = document.getElementById('uName').value;
             const p = document.getElementById('uPhone').value;
             const pNum = p.replace(/[^0-9]/g, "");
 
-            if(!n || !g || !p) {
-                alert("빈칸을 모두 채워주세요.");
-                return;
-            }
-            if(pNum.length < 10) {
-                alert("전화번호를 정확히 입력해주세요.");
-                return;
-            }
-            console.log("검증 완료:", n, g, pNum);
+            if(!n || !g || !p) { alert("빈칸을 모두 채워주세요."); return; }
+            if(pNum.length < 10) { alert("전화번호를 정확히 입력해주세요."); return; }
+
+            // 로딩 오버레이 보이기
+            const overlay = document.getElementById('loadingOverlay');
+            const loadVid = document.getElementById('loadVideo');
+            overlay.style.display = 'block';
+            loadVid.play();
+
+            // 로딩 영상 재생 후(약 4.2초 뒤) 결과 알림 (나중에 사주 영상으로 연결)
+            setTimeout(() => {
+                alert("해독이 완료되었습니다! 다음 단계인 사주 결과 화면으로 넘어갑니다.");
+                // 여기에 사주 결과 페이지 연결: window.location.href = "result.html"; 
+            }, 4200); 
         }
     </script>
 </body>
