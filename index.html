@@ -5,117 +5,128 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>하루선녀 - 운명의 기록</title>
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; overflow-x: hidden; background: #000; font-family: 'Pretendard', sans-serif; }
+        body, html { margin: 0; padding: 0; width: 100%; overflow-x: hidden; background: #000; font-family: 'Pretendard', sans-serif; color: #fff; }
         .video-container { position: relative; width: 100%; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; scroll-snap-align: start; }
         video { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
-        
-        /* 스크롤 부드럽게 */
         body { scroll-snap-type: y mandatory; }
 
-        /* 정보 기입창 스타일 (소용돌이 위치) */
+        /* 입력창 컨테이너 - 위치를 하단으로 조정 (말풍선 피함) */
         .form-overlay {
             position: absolute;
-            top: 50%; 
+            bottom: 8%; /* 아래쪽으로 배치 */
             left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80%;
+            transform: translateX(-50%);
+            width: 85%;
             max-width: 400px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 25px;
+            background: rgba(0, 0, 0, 0.75);
+            padding: 20px;
             border-radius: 20px;
-            border: 2px solid rgba(255, 215, 0, 0.5);
+            border: 1px solid rgba(255, 215, 0, 0.3);
             display: none; 
             flex-direction: column;
             gap: 12px;
             z-index: 100;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+            backdrop-filter: blur(5px);
         }
-        input, select {
-            padding: 14px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            font-size: 16px;
-            outline: none;
+
+        /* 이름 & 번호 입력 */
+        .input-group input {
+            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444;
+            background: rgba(255, 255, 255, 0.1); color: #fff; font-size: 15px; box-sizing: border-box;
         }
+
+        /* 성별 버튼식 선택 */
+        .gender-group { display: flex; gap: 10px; }
+        .gender-btn {
+            flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #444;
+            background: rgba(255, 255, 255, 0.1); color: #888; cursor: pointer; text-align: center;
+        }
+        .gender-btn.active { border-color: #ffd700; color: #ffd700; background: rgba(255, 215, 0, 0.1); }
+
+        /* 생년월일시 드롭다운 그룹 */
+        .select-row { display: flex; gap: 5px; }
+        select {
+            flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #444;
+            background: #1a1a1a; color: #fff; font-size: 13px;
+        }
+
         .btn-submit {
-            padding: 16px;
-            background: linear-gradient(135deg, #ffd700, #ffae00);
-            border: none;
-            border-radius: 30px;
-            font-weight: bold;
-            color: #000;
-            font-size: 18px;
-            cursor: pointer;
-            margin-top: 10px;
+            padding: 15px; background: linear-gradient(45deg, #ffd700, #ff8c00);
+            border: none; border-radius: 10px; font-weight: bold; color: #000; font-size: 16px; margin-top: 5px;
         }
     </style>
 </head>
 <body>
 
+    <div class="video-container"><video id="vid1" muted playsinline><source src="intro_01.mp4.mp4" type="video/mp4"></video></div>
+    <div class="video-container"><video id="vid2" muted playsinline><source src="intro_02.mp4.mp4" type="video/mp4"></video></div>
     <div class="video-container">
-        <video id="vid1" muted playsinline>
-            <source src="intro_01.mp4" type="video/mp4">
-        </video>
-    </div>
-
-    <div class="video-container">
-        <video id="vid2" muted playsinline>
-            <source src="intro_02.mp4" type="video/mp4">
-        </video>
-    </div>
-
-    <div class="video-container">
-        <video id="vid3" loop muted playsinline>
-            <source src="intro_03.mp4" type="video/mp4">
-        </video>
-        
+        <video id="vid3" loop muted playsinline><source src="intro_03.mp4.mp4" type="video/mp4"></video>
         <div class="form-overlay" id="infoForm">
-            <input type="text" placeholder="이름" id="uName">
-            <input type="tel" placeholder="전화번호" id="uPhone">
-            <select id="uGender">
-                <option value="">성별 선택</option>
-                <option value="male">남성</option>
-                <option value="female">여성</option>
+            <div class="input-group">
+                <input type="text" id="uName" placeholder="이름을 입력하세요">
+            </div>
+            <div class="input-group">
+                <input type="tel" id="uPhone" placeholder="전화번호 (010-0000-0000)">
+            </div>
+            <div class="gender-group">
+                <div class="gender-btn" onclick="selectGender('남', this)">남성</div>
+                <div class="gender-btn" onclick="selectGender('여', this)">여성</div>
+            </div>
+            <div class="select-row">
+                <select id="birthYear"></select>
+                <select id="birthMonth"></select>
+                <select id="birthDay"></select>
+            </div>
+            <select id="birthTime">
+                <option value="모름">태어난 시간 (모름)</option>
+                <option value="자시">자시 (23~01시)</option><option value="축시">축시 (01~03시)</option>
+                <option value="인시">인시 (03~05시)</option><option value="묘시">묘시 (05~07시)</option>
+                <option value="진시">진시 (07~09시)</option><option value="사시">사시 (09~11시)</option>
+                <option value="오시">오시 (11~13시)</option><option value="미시">미시 (13~15시)</option>
+                <option value="신시">신시 (15~17시)</option><option value="유시">유시 (17~19시)</option>
+                <option value="술시">술시 (19~21시)</option><option value="해시">해시 (21~23시)</option>
             </select>
-            <input type="date" id="uBirth">
-            <button class="btn-submit" onclick="startFortune()">운명의 기록 확인하기</button>
+            <button class="btn-submit" onclick="startFortune()">기록 확인하기</button>
         </div>
     </div>
 
     <script>
+        // 년/월/일 옵션 생성
+        const ySelect = document.getElementById('birthYear');
+        const mSelect = document.getElementById('birthMonth');
+        const dSelect = document.getElementById('birthDay');
+        
+        for(let y=2024; y>=1950; y--) ySelect.innerHTML += `<option value="${y}">${y}년</option>`;
+        for(let m=1; m<=12; m++) mSelect.innerHTML += `<option value="${m}">${m}월</option>`;
+        for(let d=1; d<=31; d++) dSelect.innerHTML += `<option value="${d}">${d}일</option>`;
+
+        let selectedGender = "";
+        function selectGender(g, btn) {
+            selectedGender = g;
+            document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
         const videos = document.querySelectorAll('video');
         const form = document.getElementById('infoForm');
-
-        const options = { threshold: 0.7 };
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                const vid = entry.target;
                 if (entry.isIntersecting) {
-                    vid.currentTime = 0;
-                    vid.play();
-                    // 장면 3 포털 위치에서 폼 등장
-                    if(vid.id === 'vid3') {
-                        setTimeout(() => { form.style.display = 'flex'; }, 800);
-                    }
+                    entry.target.play();
+                    if(entry.target.id === 'vid3') setTimeout(() => { form.style.display = 'flex'; }, 800);
                 } else {
-                    vid.pause();
-                    if(vid.id === 'vid3') form.style.display = 'none';
+                    entry.target.pause();
+                    if(entry.target.id === 'vid3') form.style.display = 'none';
                 }
             });
-        }, options);
-
+        }, { threshold: 0.6 });
         videos.forEach(v => observer.observe(v));
 
         function startFortune() {
             const name = document.getElementById('uName').value;
-            const phone = document.getElementById('uPhone').value;
-            if(!name || !phone) { 
-                alert("성함과 전화번호를 입력하셔야 기록을 읽을 수 있습니다."); 
-                return; 
-            }
-            alert(name + "님, 이제 당신의 사주 결과 1막 1컷으로 들어갑니다.");
+            if(!name || !selectedGender) { alert("이름과 성별을 확인해주세요."); return; }
+            alert(name + "님, 사주 풀이로 이동합니다.");
         }
     </script>
 </body>
