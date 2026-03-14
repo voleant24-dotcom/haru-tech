@@ -1,90 +1,74 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>하루선녀</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>하루선녀 테스트</title>
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; color: #fff; font-family: 'Pretendard', sans-serif; overflow: hidden; }
-        
-        /* 인트로 스크롤 영역 */
-        .v-container { position: relative; width: 100%; height: 100vh; overflow: hidden; scroll-snap-align: start; }
-        video { width: 100%; height: 100%; object-fit: cover; }
-        body { scroll-snap-type: y mandatory; overflow-y: scroll; }
-
-        /* 입력창 디자인 */
-        .input-box {
-            position: absolute; bottom: 2%; left: 50%; transform: translateX(-50%);
-            width: 85%; max-width: 400px; background: rgba(0,0,0,0.92);
-            padding: 15px; border-radius: 20px; border: 1px solid #ffd700;
-            display: none; flex-direction: column; gap: 8px; z-index: 999;
-            box-sizing: border-box;
+        body { margin: 0; background: #000; color: #fff; text-align: center; }
+        video { width: 100%; height: 100vh; object-fit: cover; display: none; }
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; }
+        .input-ui { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; }
+        #sajuText { 
+            position: fixed; bottom: 15%; left: 50%; transform: translateX(-50%); 
+            width: 80%; z-index: 10001; font-size: 1.2rem; font-weight: bold;
+            text-shadow: 2px 2px 4px #000; color: #fff; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px;
         }
-        input, select { 
-            width: 100%; padding: 13px; border-radius: 10px; border: 1px solid #444; 
-            background-color: #1a1a1a !important; color: #ffffff !important; 
-            font-size: 15px; box-sizing: border-box; outline: none;
-        }
-        .select-row { display: flex; gap: 8px; width: 100%; }
-        .gender-row { display: flex; gap: 10px; }
-        .gender-btn { 
-            flex: 1; text-align: center; cursor: pointer; font-weight: bold; color: #aaa; 
-            padding: 13px; border-radius: 10px; border: 1px solid #444; background: #1a1a1a;
-        }
-        .gender-btn.active { border-color: #ffd700; color: #ffd700; background: rgba(255,215,0,0.15); }
-        .submit-btn { 
-            background: linear-gradient(45deg, #ffd700, #ff8c00); 
-            color: #000; font-weight: bold; border: none; padding: 15px; border-radius: 12px; font-size: 17px;
-        }
-
-        /* 로딩 & 사주 스테이지 (고정 레이어) */
-        #loadingOverlay, #sajuStage {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 10000; display: none;
-        }
-        #sajuStage { z-index: 11000; }
-
-        /* 말풍선 텍스트 오버레이 */
-        .saju-text-overlay {
-            position: absolute; font-family: 'Pretendard', sans-serif;
-            font-size: 1.15rem; font-weight: 700; color: #2c2c2c;
-            text-align: center; z-index: 12000; pointer-events: none;
-            display: flex; align-items: center; justify-content: center;
-            word-break: keep-all; line-height: 1.4;
-        }
-
-        /* 컷별 말풍선 위치 정밀 조정 */
-        .pos-001, .pos-002, .pos-004, .pos-005 { top: 78%; left: 50%; transform: translate(-50%, -50%); width: 65%; }
-        .pos-003 { top: 22%; left: 78%; transform: translate(-50%, -50%); width: 22%; }
-        .pos-006 { top: 44%; left: 70%; transform: translate(-50%, -50%); width: 25%; }
-        .pos-007 { top: 75%; left: 34%; transform: translate(-50%, -50%); width: 42%; }
-        .pos-008 { top: 17%; left: 50%; transform: translate(-50%, -50%); width: 40%; }
-        .pos-009 { top: 71%; left: 55%; transform: translate(-50%, -50%); width: 48%; }
-        .pos-010 { top: 19%; left: 27%; transform: translate(-50%, -50%); width: 28%; }
     </style>
 </head>
 <body>
 
-    <div class="v-container"><video id="v1" muted playsinline><source src="intro_01.mp4" type="video/mp4"></video></div>
-    <div class="v-container"><video id="v2" muted playsinline><source src="intro_02.mp4" type="video/mp4"></video></div>
-    <div class="v-container">
-        <video id="v3" loop muted playsinline><source src="intro_03.mp4" type="video/mp4"></video>
-        <div class="input-box" id="f">
-            <input type="text" id="uName" placeholder="성함">
-            <div class="gender-row">
-                <div class="gender-btn" onclick="sel('남', this)">남성</div>
-                <div class="gender-btn" onclick="sel('여', this)">여성</div>
-            </div>
-            <div class="select-row">
-                <select id="yy"></select><select id="mm"></select><select id="dd"></select>
-            </div>
-            <select id="tm">
-                <option value="모름">태어난 시간 (모름)</option>
-                <option value="자시">자시 (23~01시)</option><option value="축시">축시 (01~03시)</option>
-                <option value="인시">인시 (03~05시)</option><option value="묘시">묘시 (05~07시)</option>
-                <option value="진시">진시 (07~09시)</option><option value="사시">사시 (09~11시)</option>
-                <option value="오시">오시 (11~13시)</option><option value="미시">미시 (13~15시)</option>
-                <option value="신시">신시 (15~17시)</option><option value="유시">유시 (17~19시)</option>
-                <option value="술시">술시 (19~21시)</option><option value="해시">해시 (21~23시)</option>
-            </select>
-            <input type="tel" id="uPhone" placeholder
+    <div id="startUI" class="input-ui">
+        <input type="text" id="uName" placeholder="이름 입력">
+        <button onclick="go()">운세 시작하기</button>
+    </div>
+
+    <div id="loadingOverlay" style="display:none;">
+        <h2 style="margin-top:45vh;">신령님께 가는 중...</h2>
+    </div>
+
+    <video id="mainVid" playsinline muted></video>
+    <div id="sajuText" style="display:none;"></div>
+
+    <script>
+        const video = document.getElementById('mainVid');
+        const textDiv = document.getElementById('sajuText');
+
+        function go() {
+            const name = document.getElementById('uName').value;
+            if(!name) { alert("이름을 써주세요"); return; }
+            
+            document.getElementById('startUI').style.display = 'none';
+            document.getElementById('loadingOverlay').style.display = 'block';
+
+            // 2초 뒤에 바로 영상 재생
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                video.style.display = 'block';
+                textDiv.style.display = 'block';
+                playCut(1, name);
+            }, 2000);
+        }
+
+        function playCut(num, name) {
+            const fileNum = String(num).padStart(3, '0');
+            video.src = `saju${fileNum}.mp4`;
+            
+            // 대사 처리
+            if(num == 1) textDiv.innerText = name + "님, 환영해요!";
+            else textDiv.innerText = num + "번째 운명을 읽고 있어요.";
+
+            video.load(); // 영상 새로고침
+            video.play().catch(e => {
+                console.log("재생 오류:", e);
+                alert("영상을 찾을 수 없거나 재생할 수 없습니다: saju" + fileNum + ".mp4");
+            });
+
+            video.onended = () => {
+                if(num < 10) playCut(num + 1, name);
+                else alert("10컷 종료!");
+            };
+        }
+    </script>
+</body>
+</html>
