@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>하루선녀</title>
     <style>
-        /* [기존 스타일 유지] */
         body, html { margin: 0; padding: 0; width: 100%; background: #000; color: #fff; font-family: 'Pretendard', sans-serif; overflow-x: hidden; }
         .v-container { position: relative; width: 100%; height: 100vh; overflow: hidden; scroll-snap-align: start; }
         video { width: 100%; height: 100%; object-fit: cover; }
         body { scroll-snap-type: y mandatory; }
 
+        /* 입력창: 가로 85%, 하단 2% 사수 */
         .input-box {
             position: absolute; bottom: 2%; left: 50%; transform: translateX(-50%);
             width: 85%; max-width: 400px; background: rgba(0,0,0,0.92);
@@ -27,27 +27,32 @@
         }
 
         .select-row { display: flex; gap: 8px; width: 100%; }
-        .select-row select { flex: 1; padding-right: 20px; background-image: url("data:image/svg+xml;..."); background-repeat: no-repeat; background-position: right 8px center; background-size: 8px auto; }
+        .select-row select { 
+            flex: 1; padding-right: 20px;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat; background-position: right 8px center; background-size: 8px auto;
+        }
+
         .gender-row { display: flex; gap: 10px; }
-        .gender-btn { flex: 1; text-align: center; cursor: pointer; font-weight: bold; color: #aaa; padding: 13px; border-radius: 10px; border: 1px solid #444; background: #1a1a1a; font-size: 15px; }
+        .gender-btn { 
+            flex: 1; text-align: center; cursor: pointer; font-weight: bold; color: #aaa; 
+            padding: 13px; border-radius: 10px; border: 1px solid #444; background: #1a1a1a; font-size: 15px;
+        }
         .gender-btn.active { border-color: #ffd700; color: #ffd700; background: rgba(255,215,0,0.15); }
-        .submit-btn { background: linear-gradient(45deg, #ffd700, #ff8c00); color: #000; font-weight: bold; border: none; padding: 15px; border-radius: 12px; font-size: 17px; margin-top: 2px; }
+        
+        .submit-btn { 
+            background: linear-gradient(45deg, #ffd700, #ff8c00); 
+            color: #000; font-weight: bold; border: none; padding: 15px; border-radius: 12px; font-size: 17px; margin-top: 2px;
+        }
+
         .info-text { color: #eee; font-size: 11px; text-align: center; line-height: 1.3; margin-top: 2px; letter-spacing: -0.5px; }
 
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; display: none; }
-        #loadingOverlay video { width: 100%; height: 100%; object-fit: cover; }
-
-        /* [사주 섹션 추가] */
-        #sajuSection { display: none; }
-        .bubble { 
-            position: absolute; z-index: 1000; font-weight: 700; color: #fff; 
-            text-align: center; word-break: keep-all; display: flex; align-items: center; justify-content: center;
-            background: rgba(255, 0, 0, 0.5); border: 2px solid red; /* 좌표 확인용 빨간박스 */
+        /* 로딩 화면: 배경만 있고 버튼 태그는 아예 없음 */
+        #loadingOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 10000; display: none;
         }
-        /* 회장님이 숫자만 수정할 좌표 블록 */
-        .pos-001 { top: 78%; left: 50%; transform: translate(-50%, -50%); width: 65%; }
-        .pos-002 { top: 78%; left: 50%; transform: translate(-50%, -50%); width: 65%; }
-        /* ... 010까지 좌표 클래스 필요시 추가 ... */
+        #loadingOverlay video { width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
 <body>
@@ -80,27 +85,35 @@
         </div>
     </div>
 
-    <div id="loadingOverlay"><video id="loadVideo" muted playsinline><source src="loading.mp4" type="video/mp4"></video></div>
-
-    <div id="sajuSection">
-        <div class="v-container"><video muted playsinline><source src="saju001.mp4" type="video/mp4"></video><div class="bubble pos-001" id="t1"></div></div>
-        <div class="v-container"><video muted playsinline><source src="saju002.mp4" type="video/mp4"></video><div class="bubble pos-002" id="t2"></div></div>
-        </div>
+    <div id="loadingOverlay">
+        <video id="loadVideo" muted playsinline>
+            <source src="loading.mp4" type="video/mp4">
+        </video>
+    </div>
 
     <script>
         const y=document.getElementById('yy'), m=document.getElementById('mm'), d=document.getElementById('dd');
-        for(let i=2026;i>=1950;i--) if(y) y.innerHTML+=`<option value="${i}">${i}년</option>`;
-        for(let i=1;i<=12;i++) if(m) m.innerHTML+=`<option value="${i}">${i}월</option>`;
-        for(let i=1;i<=31;i++) if(d) d.innerHTML+=`<option value="${i}">${i}일</option>`;
+        for(let i=2026;i>=1950;i--) y.innerHTML+=`<option value="${i}">${i}년</option>`;
+        for(let i=1;i<=12;i++) m.innerHTML+=`<option value="${i}">${i}월</option>`;
+        for(let i=1;i<=31;i++) d.innerHTML+=`<option value="${i}">${i}일</option>`;
 
         let g = "";
-        function sel(v, btn){ g = v; document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+        function sel(v, btn){
+            g = v;
+            document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
 
         const obs = new IntersectionObserver((es) => {
             es.forEach(e => {
                 const v = e.target.querySelector('video');
-                if(e.isIntersecting) { v.play(); if(v.id === 'v3') setTimeout(() => { document.getElementById('f').style.display = 'flex'; }, 800); }
-                else { v.pause(); if(v.id === 'v3') document.getElementById('f').style.display = 'none'; }
+                if(e.isIntersecting) {
+                    v.play();
+                    if(v.id === 'v3') setTimeout(() => { document.getElementById('f').style.display = 'flex'; }, 800);
+                } else {
+                    v.pause();
+                    if(v.id === 'v3') document.getElementById('f').style.display = 'none';
+                }
             });
         }, {threshold: 0.6});
         document.querySelectorAll('.v-container').forEach(c => obs.observe(c));
@@ -108,24 +121,20 @@
         function go(){
             const n = document.getElementById('uName').value;
             const p = document.getElementById('uPhone').value;
+            const pNum = p.replace(/[^0-9]/g, "");
+
             if(!n || !g || !p) { alert("빈칸을 모두 채워주세요."); return; }
+            if(pNum.length < 10) { alert("전화번호를 정확히 입력해주세요."); return; }
 
-            const overlay = document.getElementById('loadingOverlay'), loadVid = document.getElementById('loadVideo');
-            overlay.style.display = 'block'; loadVid.play();
+            // 로딩 시작
+            const overlay = document.getElementById('loadingOverlay');
+            const loadVid = document.getElementById('loadVideo');
+            overlay.style.display = 'block';
+            loadVid.play();
 
+            // 로딩 영상이 끝나도 다음으로 안 넘어가고 '정지' 상태 유지
             loadVid.onended = function() {
-                overlay.style.display = 'none';
-                const section = document.getElementById('sajuSection');
-                section.style.display = 'block';
-                
-                // 좌표 확인용 텍스트 (나중에 자동 교체됨)
-                for(let i=1; i<=10; i++) {
-                    const target = document.getElementById('t' + i);
-                    if(target) target.innerText = i + "번 TEST";
-                }
-
-                section.querySelectorAll('.v-container').forEach(c => obs.observe(c));
-                section.querySelector('.v-container').scrollIntoView({ behavior: 'smooth' });
+                console.log("로딩 영상 끝. 회장님 지시 대기 중.");
             };
         }
     </script>
