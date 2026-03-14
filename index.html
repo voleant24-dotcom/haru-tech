@@ -1,73 +1,128 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>하루선녀 테스트</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>하루선녀</title>
     <style>
-        body { margin: 0; background: #000; color: #fff; text-align: center; }
-        video { width: 100%; height: 100vh; object-fit: cover; display: none; }
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; }
-        .input-ui { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; }
-        #sajuText { 
-            position: fixed; bottom: 15%; left: 50%; transform: translateX(-50%); 
-            width: 80%; z-index: 10001; font-size: 1.2rem; font-weight: bold;
-            text-shadow: 2px 2px 4px #000; color: #fff; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px;
+        body, html { margin: 0; padding: 0; width: 100%; background: #000; color: #fff; font-family: 'Pretendard', sans-serif; overflow-x: hidden; }
+        .v-container { position: relative; width: 100%; height: 100vh; overflow: hidden; scroll-snap-align: start; }
+        video { width: 100%; height: 100%; object-fit: cover; }
+        body { scroll-snap-type: y mandatory; }
+
+        /* 입력창 스타일 */
+        .input-box {
+            position: absolute; bottom: 2%; left: 50%; transform: translateX(-50%);
+            width: 85%; max-width: 400px; background: rgba(0,0,0,0.92);
+            padding: 15px; border-radius: 20px; border: 1px solid #ffd700;
+            display: none; flex-direction: column; gap: 8px; z-index: 999;
         }
+        input, select { width: 100%; padding: 13px; border-radius: 10px; border: 1px solid #444; background: #1a1a1a; color: #fff; font-size: 15px; outline: none; }
+        .gender-row { display: flex; gap: 10px; }
+        .gender-btn { flex: 1; text-align: center; cursor: pointer; padding: 13px; border-radius: 10px; border: 1px solid #444; background: #1a1a1a; }
+        .gender-btn.active { border-color: #ffd700; color: #ffd700; background: rgba(255,215,0,0.15); }
+        .submit-btn { background: linear-gradient(45deg, #ffd700, #ff8c00); color: #000; font-weight: bold; border: none; padding: 15px; border-radius: 12px; font-size: 17px; cursor: pointer; }
+
+        /* 로딩 화면 */
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; display: none; }
+        
+        /* 선녀님 전용 스테이지 */
+        #sajuStage { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 11000; display: none; }
+        .saju-text-overlay { 
+            position: absolute; font-size: 1.15rem; font-weight: 700; color: #2c2c2c; 
+            text-align: center; z-index: 12000; pointer-events: none; display: flex; align-items: center; justify-content: center;
+        }
+
+        /* 말풍선 좌표 */
+        .pos-001, .pos-002, .pos-004, .pos-005 { top: 78%; left: 50%; transform: translate(-50%, -50%); width: 65%; }
+        .pos-003 { top: 22%; left: 78%; transform: translate(-50%, -50%); width: 22%; }
+        .pos-006 { top: 44%; left: 70%; transform: translate(-50%, -50%); width: 25%; }
+        .pos-007 { top: 75%; left: 34%; transform: translate(-50%, -50%); width: 42%; }
+        .pos-008 { top: 17%; left: 50%; transform: translate(-50%, -50%); width: 40%; }
+        .pos-009 { top: 71%; left: 55%; transform: translate(-50%, -50%); width: 48%; }
+        .pos-010 { top: 19%; left: 27%; transform: translate(-50%, -50%); width: 28%; }
     </style>
 </head>
 <body>
 
-    <div id="startUI" class="input-ui">
-        <input type="text" id="uName" placeholder="이름 입력">
-        <button onclick="go()">운세 시작하기</button>
+    <div class="v-container"><video id="v1" muted playsinline><source src="intro_01.mp4" type="video/mp4"></video></div>
+    <div class="v-container"><video id="v2" muted playsinline><source src="intro_02.mp4" type="video/mp4"></video></div>
+    <div class="v-container">
+        <video id="v3" loop muted playsinline><source src="intro_03.mp4" type="video/mp4"></video>
+        <div class="input-box" id="f">
+            <input type="text" id="uName" placeholder="성함">
+            <div class="gender-row">
+                <div class="gender-btn" onclick="sel('남', this)">남성</div>
+                <div class="gender-btn" onclick="sel('여', this)">여성</div>
+            </div>
+            <div class="select-row" style="display:flex; gap:8px;">
+                <select id="yy"></select><select id="mm"></select><select id="dd"></select>
+            </div>
+            <input type="tel" id="uPhone" placeholder="전화번호" style="margin-top:8px;">
+            <button class="submit-btn" onclick="go()" style="margin-top:8px;">기록 확인하기</button>
+        </div>
     </div>
 
-    <div id="loadingOverlay" style="display:none;">
-        <h2 style="margin-top:45vh;">신령님께 가는 중...</h2>
+    <div id="loadingOverlay"><video id="loadVideo" muted playsinline><source src="loading.mp4" type="video/mp4"></video></div>
+    <div id="sajuStage">
+        <video id="sajuVideo" muted playsinline></video>
+        <div id="sajuText" class="saju-text-overlay"></div>
     </div>
-
-    <video id="mainVid" playsinline muted></video>
-    <div id="sajuText" style="display:none;"></div>
 
     <script>
-        const video = document.getElementById('mainVid');
-        const textDiv = document.getElementById('sajuText');
+        // 1. 인트로 로직 (원래 잘 되던 것 복구)
+        const y=document.getElementById('yy'), m=document.getElementById('mm'), d=document.getElementById('dd');
+        for(let i=2026;i>=1950;i--) y.innerHTML+=`<option value="${i}">${i}년</option>`;
+        for(let i=1;i<=12;i++) m.innerHTML+=`<option value="${i}">${i}월</option>`;
+        for(let i=1;i<=31;i++) d.innerHTML+=`<option value="${i}">${i}일</option>`;
 
+        let g = "";
+        function sel(v, btn){ g = v; document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+
+        const obs = new IntersectionObserver((es) => {
+            es.forEach(e => {
+                const v = e.target.querySelector('video');
+                if(e.isIntersecting) { v.play(); if(v.id === 'v3') document.getElementById('f').style.display = 'flex'; }
+                else { v.pause(); if(v.id === 'v3') document.getElementById('f').style.display = 'none'; }
+            });
+        }, {threshold: 0.6});
+        document.querySelectorAll('.v-container').forEach(c => obs.observe(c));
+
+        // 2. 연결 고리 (로딩 -> 사주)
         function go() {
-            const name = document.getElementById('uName').value;
-            if(!name) { alert("이름을 써주세요"); return; }
-            
-            document.getElementById('startUI').style.display = 'none';
+            const n = document.getElementById('uName').value;
+            if(!n || !g) { alert("정보를 입력해주세요"); return; }
             document.getElementById('loadingOverlay').style.display = 'block';
-
-            // 2초 뒤에 바로 영상 재생
-            setTimeout(() => {
-                document.getElementById('loadingOverlay').style.display = 'none';
-                video.style.display = 'block';
-                textDiv.style.display = 'block';
-                playCut(1, name);
-            }, 2000);
+            const lv = document.getElementById('loadVideo');
+            lv.play();
+            lv.onended = () => { startSaju(n); };
         }
 
-        function playCut(num, name) {
-            const fileNum = String(num).padStart(3, '0');
-            video.src = `saju${fileNum}.mp4`;
+        function startSaju(name) {
+            document.getElementById('loadingOverlay').style.display = 'none';
+            document.getElementById('sajuStage').style.display = 'block';
+            playSajuCut(1, name);
+        }
+
+        function playSajuCut(num, name) {
+            const v = document.getElementById('sajuVideo');
+            const t = document.getElementById('sajuText');
+            const fn = String(num).padStart(3, '0');
             
-            // 대사 처리
-            if(num == 1) textDiv.innerText = name + "님, 환영해요!";
-            else textDiv.innerText = num + "번째 운명을 읽고 있어요.";
-
-            video.load(); // 영상 새로고침
-            video.play().catch(e => {
-                console.log("재생 오류:", e);
-                alert("영상을 찾을 수 없거나 재생할 수 없습니다: saju" + fileNum + ".mp4");
-            });
-
-            video.onended = () => {
-                if(num < 10) playCut(num + 1, name);
-                else alert("10컷 종료!");
+            v.src = `saju${fn}.mp4`;
+            t.className = `saju-text-overlay pos-${fn}`;
+            
+            const msgs = { 
+                1: name + "님, 귀한 운명을 해독합니다.", 
+                2: "기운이 솟구치는 게 보이시나요?", 
+                7: "그동안 참 고생 많으셨어요.",
+                10: "이제 재물운을 열어볼까요?" 
             };
+            t.innerText = msgs[num] || "운명의 실타래를 푸는 중...";
+            
+            v.load();
+            v.play();
+            v.onended = () => { if(num < 10) playSajuCut(num + 1, name); };
         }
     </script>
 </body>
