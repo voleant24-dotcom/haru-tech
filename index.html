@@ -10,10 +10,10 @@
         video { width: 100%; height: 100%; object-fit: cover; }
         body { scroll-snap-type: y mandatory; }
 
-        /* 입력창 박스 - 크기를 줄여 말풍선 가림 방지 */
+        /* 입력창 박스 - 회장님 지시대로 너비 75%로 수정 */
         .input-box {
             position: absolute; bottom: 5%; left: 50%; transform: translateX(-50%);
-            width: 70%; max-width: 360px; background: rgba(0,0,0,0.92);
+            width: 75%; max-width: 340px; background: rgba(0,0,0,0.92);
             padding: 18px 15px; border-radius: 22px; border: 1px solid #ffd700;
             display: none; flex-direction: column; gap: 10px; z-index: 999;
             box-sizing: border-box;
@@ -22,34 +22,35 @@
         input, select { 
             width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #444; 
             background-color: #1a1a1a !important; color: #ffffff !important; 
-            font-size: 16px; box-sizing: border-box; outline: none;
+            font-size: 15px; box-sizing: border-box; outline: none;
             -webkit-appearance: none; appearance: none;
         }
 
         .select-row { display: flex; gap: 8px; width: 100%; }
         .select-row select { 
             flex: 1; 
-            padding-right: 22px;
+            padding-right: 20px;
             background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
             background-repeat: no-repeat;
             background-position: right 8px center;
-            background-size: 9px auto;
+            background-size: 8px auto;
         }
 
         .gender-row { display: flex; gap: 10px; }
         .gender-btn { 
             flex: 1; text-align: center; cursor: pointer; font-weight: bold; color: #aaa; 
             padding: 14px; border-radius: 10px; border: 1px solid #444; background: #1a1a1a;
+            font-size: 15px;
         }
         .gender-btn.active { border-color: #ffd700; color: #ffd700; background: rgba(255,215,0,0.15); }
         
         .submit-btn { 
             background: linear-gradient(45deg, #ffd700, #ff8c00); 
-            color: #000; font-weight: bold; border: none; padding: 16px; border-radius: 12px; font-size: 18px; margin-top: 3px;
+            color: #000; font-weight: bold; border: none; padding: 16px; border-radius: 12px; font-size: 17px; margin-top: 3px;
         }
 
         .info-text {
-            color: #eee; font-size: 12px; text-align: center; line-height: 1.4; margin-top: 3px; letter-spacing: -0.5px;
+            color: #eee; font-size: 11px; text-align: center; line-height: 1.4; margin-top: 3px; letter-spacing: -0.5px;
         }
     </style>
 </head>
@@ -113,9 +114,12 @@
         function go(){
             const n = document.getElementById('uName').value;
             const p = document.getElementById('uPhone').value;
+            const pNum = p.replace(/[^0-9]/g, "");
+
             if(!n || !g || !p) return alert("빈칸을 모두 채워주세요.");
-            // 다음 기능 추가 시 여기에 코딩 예정
-            console.log("데이터 확인:", n, g, p);
+            if(pNum.length < 10) return alert("전화번호를 정확히 입력해주세요.");
+            
+            console.log("데이터 확인:", n, g, pNum);
         }
     </script>
 </body>
