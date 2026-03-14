@@ -10,7 +10,7 @@
         video { width: 100%; height: 100%; object-fit: cover; }
         body { scroll-snap-type: y mandatory; }
 
-        /* 입력창 디자인 - 회장님 컨펌 완료 (가로 85%, 하단 2%) */
+        /* 입력창 디자인 - 회장님 컨펌안 (가로 85%, 하단 2%) */
         .input-box {
             position: absolute; bottom: 2%; left: 50%; transform: translateX(-50%);
             width: 85%; max-width: 400px; background: rgba(0,0,0,0.92);
@@ -47,12 +47,30 @@
 
         .info-text { color: #eee; font-size: 11px; text-align: center; line-height: 1.3; margin-top: 2px; letter-spacing: -0.5px; }
 
-        /* ⭐ 로딩 오버레이 레이어 (중요!) */
+        /* 로딩 오버레이 */
         #loadingOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 10000; display: none;
         }
         #loadingOverlay video { width: 100%; height: 100%; object-fit: cover; }
+
+        /* ⭐ 중앙 결과 확인 버튼 스타일 */
+        #resultBtnWrap {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            display: none; z-index: 10001; width: 80%; text-align: center;
+        }
+        .final-btn {
+            background: linear-gradient(45deg, #ffd700, #ff8c00);
+            color: #000; font-weight: 800; border: 2px solid #fff; padding: 20px 30px; 
+            border-radius: 50px; font-size: 20px; cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
@@ -89,6 +107,9 @@
         <video id="loadVideo" muted playsinline>
             <source src="loading.mp4" type="video/mp4">
         </video>
+        <div id="resultBtnWrap">
+            <button class="final-btn" onclick="startSaju()">✨ 운명의 기록 확인하기 ✨</button>
+        </div>
     </div>
 
     <script>
@@ -118,7 +139,6 @@
         }, {threshold: 0.6});
         document.querySelectorAll('.v-container').forEach(c => obs.observe(c));
 
-        // ⭐ 로딩 시작 및 다음 화면 전환 로직
         function go(){
             const n = document.getElementById('uName').value;
             const p = document.getElementById('uPhone').value;
@@ -127,17 +147,25 @@
             if(!n || !g || !p) { alert("빈칸을 모두 채워주세요."); return; }
             if(pNum.length < 10) { alert("전화번호를 정확히 입력해주세요."); return; }
 
-            // 로딩 오버레이 보이기
             const overlay = document.getElementById('loadingOverlay');
             const loadVid = document.getElementById('loadVideo');
+            const btnWrap = document.getElementById('resultBtnWrap');
+            
             overlay.style.display = 'block';
             loadVid.play();
 
-            // 로딩 영상 재생 후(약 4.2초 뒤) 결과 알림 (나중에 사주 영상으로 연결)
+            // 로딩 영상을 5초간 보여준 뒤 중앙 버튼 노출 (유저가 충분히 느끼게)
             setTimeout(() => {
-                alert("해독이 완료되었습니다! 다음 단계인 사주 결과 화면으로 넘어갑니다.");
-                // 여기에 사주 결과 페이지 연결: window.location.href = "result.html"; 
-            }, 4200); 
+                btnWrap.style.display = 'block';
+            }, 5000); 
+        }
+
+        // 결과 확인 버튼 클릭 시 실행될 함수
+        function startSaju() {
+            // 이 함수에서 사주 영상 saju_01.mp4 재생으로 넘어가게 됩니다.
+            // 지금은 임시로 다음 단계를 준비하라는 신호만 보냅니다.
+            console.log("사주 풀이 시작!");
+            // window.location.href = "saju_start.html"; // 실제 이동 시 사용
         }
     </script>
 </body>
