@@ -10,7 +10,6 @@
         video { width: 100%; height: 100%; object-fit: cover; }
         body { scroll-snap-type: y mandatory; }
 
-        /* 입력창 디자인 - 회장님 컨펌안 (가로 85%, 하단 2%) */
         .input-box {
             position: absolute; bottom: 2%; left: 50%; transform: translateX(-50%);
             width: 85%; max-width: 400px; background: rgba(0,0,0,0.92);
@@ -47,14 +46,12 @@
 
         .info-text { color: #eee; font-size: 11px; text-align: center; line-height: 1.3; margin-top: 2px; letter-spacing: -0.5px; }
 
-        /* 로딩 오버레이 */
         #loadingOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 10000; display: none;
         }
         #loadingOverlay video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* 중앙 결과 확인 버튼 */
         #resultBtnWrap {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             display: none; z-index: 10001; width: 85%; text-align: center;
@@ -150,20 +147,18 @@
             document.getElementById('loadingOverlay').style.display = 'block';
             document.getElementById('loadVideo').play();
 
-            // 5초 뒤 버튼 노출
             setTimeout(() => {
                 document.getElementById('resultBtnWrap').style.display = 'block';
             }, 5000); 
         }
 
-        // 결과 확인 버튼 클릭 시 (팝업 없이 즉시 실행)
+        // ⭐ 팝업 삭제 완료 버전
         function startSaju() {
-            // 로딩 오버레이를 닫고 사주 결과 로직으로 진입
+            // 오버레이 제거 (팝업 없음)
             document.getElementById('loadingOverlay').style.display = 'none';
             
-            // 여기에 결과 영상(saju_01.mp4)을 재생하거나 
-            // 결과 페이지로 이동하는 코드를 바로 넣으면 됩니다.
-            console.log("팝업 없이 사주 풀이로 바로 진입합니다.");
+            // 여기에 바로 사주 영상 재생 로직이 들어옵니다.
+            console.log("즉시 사주 풀이 시작");
         }
     </script>
 </body>
