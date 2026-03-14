@@ -10,12 +10,13 @@
         .v-container { position: relative; width: 100%; height: 100vh; overflow: hidden; scroll-snap-align: start; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* 입력창 */
+        /* 입력창 (회장님 원본 스타일 유지) */
         .input-box {
             position: absolute; bottom: 2%; left: 50%; transform: translateX(-50%);
             width: 85%; max-width: 400px; background: rgba(0,0,0,0.92);
             padding: 15px; border-radius: 20px; border: 1px solid #ffd700;
             display: none; flex-direction: column; gap: 8px; z-index: 999;
+            box-sizing: border-box;
         }
         input, select { width: 100%; padding: 13px; border-radius: 10px; border: 1px solid #444; background: #1a1a1a; color: #fff; font-size: 15px; outline: none; }
         .gender-row { display: flex; gap: 10px; }
@@ -23,23 +24,25 @@
         .gender-btn.active { border-color: #ffd700; color: #ffd700; background: rgba(255,215,0,0.15); }
         .submit-btn { background: linear-gradient(45deg, #ffd700, #ff8c00); color: #000; font-weight: bold; border: none; padding: 15px; border-radius: 12px; font-size: 17px; cursor: pointer; }
 
-        /* 로딩 레이어 */
+        /* 로딩 화면 */
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; display: none; }
         
-        /* 사주 섹션 (초기 숨김) */
+        /* 사주 섹션 (로딩 완료 전까지 숨김) */
         #sajuSection { display: none; }
 
-        /* 말풍선 공통 스타일 */
-        .bubble {
-            position: absolute; z-index: 1000; font-weight: 700; color: #2c2c2c;
-            text-align: center; word-break: keep-all; display: flex; align-items: center; justify-content: center;
-        }
-
-        /* 컷별 좌표 설정 (재촬영 영상에 맞춰 수정 필요) */
+        /* 말풍선 좌표 (회장님 수정용) */
+        .bubble { position: absolute; z-index: 1000; font-weight: 700; color: #2c2c2c; text-align: center; word-break: keep-all; display: flex; align-items: center; justify-content: center; }
+        
         .pos-001 { top: 78%; left: 50%; transform: translate(-50%, -50%); width: 65%; }
         .pos-002 { top: 78%; left: 50%; transform: translate(-50%, -50%); width: 65%; }
         .pos-003 { top: 20%; left: 75%; transform: translate(-50%, -50%); width: 25%; }
-        /* 004 ~ 010 까지 동일한 방식으로 추가 */
+        .pos-004 { top: 78%; left: 50%; transform: translate(-50%, -50%); width: 65%; }
+        .pos-005 { top: 78%; left: 50%; transform: translate(-50%, -50%); width: 65%; }
+        .pos-006 { top: 40%; left: 70%; transform: translate(-50%, -50%); width: 30%; }
+        .pos-007 { top: 75%; left: 35%; transform: translate(-50%, -50%); width: 40%; }
+        .pos-008 { top: 15%; left: 50%; transform: translate(-50%, -50%); width: 45%; }
+        .pos-009 { top: 70%; left: 55%; transform: translate(-50%, -50%); width: 50%; }
+        .pos-010 { top: 20%; left: 30%; transform: translate(-50%, -50%); width: 30%; }
     </style>
 </head>
 <body>
@@ -66,19 +69,17 @@
     </div>
 
     <div id="sajuSection">
-        <div class="v-container">
-            <video muted playsinline><source src="saju001.mp4" type="video/mp4"></video>
-            <div class="bubble pos-001" id="t1"></div>
-        </div>
-        <div class="v-container">
-            <video muted playsinline><source src="saju002.mp4" type="video/mp4"></video>
-            <div class="bubble pos-002" id="t2"></div>
-        </div>
-        <div class="v-container">
-            <video muted playsinline><source src="saju003.mp4" type="video/mp4"></video>
-            <div class="bubble pos-003" id="t3"></div>
-        </div>
-        </div>
+        <div class="v-container"><video muted playsinline><source src="saju001.mp4" type="video/mp4"></video><div class="bubble pos-001" id="t1"></div></div>
+        <div class="v-container"><video muted playsinline><source src="saju002.mp4" type="video/mp4"></video><div class="bubble pos-002" id="t2"></div></div>
+        <div class="v-container"><video muted playsinline><source src="saju003.mp4" type="video/mp4"></video><div class="bubble pos-003" id="t3"></div></div>
+        <div class="v-container"><video muted playsinline><source src="saju004.mp4" type="video/mp4"></video><div class="bubble pos-004" id="t4"></div></div>
+        <div class="v-container"><video muted playsinline><source src="saju005.mp4" type="video/mp4"></video><div class="bubble pos-005" id="t5"></div></div>
+        <div class="v-container"><video muted playsinline><source src="saju006.mp4" type="video/mp4"></video><div class="bubble pos-006" id="t6"></div></div>
+        <div class="v-container"><video muted playsinline><source src="saju007.mp4" type="video/mp4"></video><div class="bubble pos-007" id="t7"></div></div>
+        <div class="v-container"><video muted playsinline><source src="saju008.mp4" type="video/mp4"></video><div class="bubble pos-008" id="t8"></div></div>
+        <div class="v-container"><video muted playsinline><source src="saju009.mp4" type="video/mp4"></video><div class="bubble pos-009" id="t9"></div></div>
+        <div class="v-container"><video muted playsinline><source src="saju010.mp4" type="video/mp4"></video><div class="bubble pos-010" id="t10"></div></div>
+    </div>
 
     <script>
         const y=document.getElementById('yy'), m=document.getElementById('mm'), d=document.getElementById('dd');
@@ -117,11 +118,10 @@
                 const section = document.getElementById('sajuSection');
                 section.style.display = 'block';
                 
-                // 텍스트 주입
-                document.getElementById('t1').innerText = n + "님, 사주 풀이를 시작합니다.";
-                document.getElementById('t2').innerText = "영상의 기운이 느껴지시나요?";
-                document.getElementById('t3').innerText = "여기서부터는 스크롤로 확인하세요.";
-
+                // 멘트 주입 (회장님 지시대로 이름만 넣고 미사여구 삭제)
+                document.getElementById('t1').innerText = n + "님의 사주입니다.";
+                // 나머지 t2~t10은 필요시 추가
+                
                 section.querySelectorAll('.v-container').forEach(c => obs.observe(c));
                 section.querySelector('.v-container').scrollIntoView({ behavior: 'smooth' });
             };
